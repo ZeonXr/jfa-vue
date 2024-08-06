@@ -2,37 +2,35 @@
 import { storeToRefs } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { fetchInstance } from '@/utils/api'
+import { computed, ref } from 'vue'
 
 const visible = defineModel({ type: Boolean, default: true })
 
 const configStore = useConfigStore()
-// const visible = ref(true)
 
 const { host, username, password, token } = storeToRefs(configStore)
 
-const { isFetching, execute, onFetchResponse, onFetchError } = fetchInstance(
-  '/token/login',
-  {
-    headers: {
-      authorization: `Basic ${btoa(`${username.value}:${password.value}`)}`
-    }
-  },
-  { immediate: false }
-)
-onFetchResponse(async (response) => {
-  if (response.ok) {
-    const resToken = await response.json()
-    token.value = resToken.token
-    visible.value = false
-  }
-})
-onFetchError(() => {
-  token.value = ''
-  visible.value = true
-})
-function login() {
+const BasicToken = computed(() => btoa(`${username.value}:${password.value}`))
+
+const isFetching = ref(false)
+
+async function login() {
   if (!host.value || !username.value || !password.value) return
-  execute()
+  isFetching.value = true
+  try {
+    const { data } = await fetchInstance('/token/login', {
+      headers: {
+        authorization: `Basic ${BasicToken.value}`
+      }
+    }).json()
+    token.value = data.value.token
+    visible.value = false
+  } catch (_) {
+    token.value = ''
+    visible.value = true
+  } finally {
+    isFetching.value = false
+  }
 }
 </script>
 
@@ -43,7 +41,7 @@ function login() {
     pt:mask:class="backdrop-blur-sm !pointer-events-auto"
   >
     <template #container>
-      <div
+      <form
         class="flex flex-col px-8 py-8 gap-6 rounded-2xl"
         style="
           background-image: radial-gradient(
@@ -52,6 +50,7 @@ function login() {
             var(--p-primary-700)
           );
         "
+        @submit.prevent="login"
       >
         <h1 class="text-white text-center text-3xl">登录</h1>
         <div class="inline-flex flex-col gap-2">
@@ -83,13 +82,13 @@ function login() {
           <Button
             text
             label="登录"
+            type="submit"
             class="!p-4 w-full !text-primary-50 !border !border-white/30 hover:!bg-white/10"
             :disabled="isFetching"
             :loading="isFetching"
-            @click="login"
           />
         </div>
-      </div>
+      </form>
     </template>
   </Dialog>
 </template>
