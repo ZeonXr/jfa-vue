@@ -179,7 +179,11 @@ function copySelected() {
 
 <template>
   <main class="jfa-vue mx-auto" style="max-width: 1080px">
-    <div class="my-4 p-2 w-full overflow-hidden rounded-xl" style="background-color: #282828">
+    <form
+      class="my-4 p-2 w-full overflow-hidden rounded-xl"
+      style="background-color: #282828"
+      @submit.prevent="createInvite"
+    >
       <h1 class="m-2 text-2xl font-bold">创建</h1>
       <section class="flex flex-wrap gap-4 w-full overflow-hidden p-4">
         <div
@@ -369,15 +373,18 @@ function copySelected() {
           :min="1"
         />
         <Button
+          type="submit"
           class="flex-1 !rounded-l-none"
           label="创建"
           :disabled="createInviteIng"
           :loading="createInviteIng"
-          @click="createInvite"
         />
       </div>
-    </div>
-    <div class="my-4 p-2 w-full overflow-hidden rounded-xl" style="background-color: #282828">
+    </form>
+    <div
+      class="flex flex-col mt-4 p-2 w-full overflow-hidden rounded-xl max-h-screen box-border"
+      style="background-color: #282828"
+    >
       <div class="m-2 text-2xl font-bold flex justify-between">
         <h1>
           <span>邀请</span>
@@ -438,7 +445,7 @@ function copySelected() {
         </div>
       </div>
       <ul
-        class="flex flex-col m-4 p-3 gap-2 overflow-hidden border border-white/10 max-h-96 overflow-y-auto rounded-md"
+        class="flex-1 flex flex-col m-4 p-3 gap-2 border border-white/10 overflow-y-auto rounded-md"
       >
         <li
           v-for="(item, index) in invites"
