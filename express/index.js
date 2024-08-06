@@ -22,8 +22,8 @@ app.use(
   })
 )
 
-// 启动服务器
-const port = 8080
+// eslint-disable-next-line no-undef
+const port = process.env.SERVER_PORT || 8080
 app.listen(port, () => {
-  console.log(`服务器运行在 http://localhost:${port}`)
+  console.log('jfa-vue启动成功')
 })

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
-    "server": "vite build && node ./express/index.js",
+    "server": "vite build && node --env-file ./.env ./express/index.js",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
@@ -21,7 +21,9 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.0.4",
     "tailwindcss-primeui": "^0.3.4",
-    "vue": "^3.4.35"
+    "vue": "^3.4.35",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0"
   },
   "devDependencies": {
     "@iconify-json/ion": "^1.1.19",

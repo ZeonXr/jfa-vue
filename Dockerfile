@@ -10,12 +10,6 @@ RUN nrm use tencent
 
 RUN pnpm install
 
-RUN pnpm build
+CMD [ "pnpm", "run" , "server"]
 
-WORKDIR /jfa-vue/express
-
-RUN pnpm install
-
-CMD [ "pnpm", "start" ]
-
-EXPOSE 8080
+EXPOSE ${SERVER_PORT:-8080}

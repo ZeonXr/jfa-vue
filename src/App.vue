@@ -378,7 +378,7 @@ function copySelected() {
       </div>
     </div>
     <div class="my-4 p-2 w-full overflow-hidden rounded-xl" style="background-color: #282828">
-      <div class="text-2xl font-bold flex justify-between">
+      <div class="m-2 text-2xl font-bold flex justify-between">
         <h1>
           <span>邀请</span>
           <span class="text-xl mr-2">({{ invites.length }})</span>
@@ -399,10 +399,12 @@ function copySelected() {
         </h1>
         <div>
           <Button
+            v-show="selectedInvites.length"
             type="button"
             :label="`复制(${selectedInvites.length})`"
             icon="pi pi-copy"
             class="!p-0 !px-2 mr-2"
+            :disabled="!selectedInvites.length"
             @click="copySelected"
           />
           <Button
