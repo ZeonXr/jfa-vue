@@ -460,13 +460,6 @@ function copySelected() {
             class="ml-2"
           />
           <div class="flex-1 flex px-2 overflow-hidden">
-            <!-- <a
-              class="flex-1 cursor-pointer hover:underline text-ellipsis overflow-hidden"
-              :href="host + '/invite/' + item.code"
-              target="_blank"
-            >
-              {{ item.code }}
-            </a> -->
             <RouterLink
               class="flex-1 cursor-pointer hover:underline text-ellipsis overflow-hidden"
               :to="`/invite/${item.code}`"

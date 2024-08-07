@@ -153,6 +153,33 @@ async function newUser() {
     newUserIng.value = false
   }
 }
+
+const downloadLink = [
+  {
+    title: '苹果TV/手机/平板',
+    info: '操作视频教程',
+    icon: 'logos--apple',
+    link: 'https://www.emby123.cn:5001/sharing/ufj2abtDo'
+  },
+  {
+    title: '安卓电视/手机/投影',
+    info: '操作教程及软件下载',
+    icon: 'logos--android-icon',
+    link: 'https://www.emby123.cn:5001/sharing/kWC9KW4WQ'
+  },
+  {
+    title: 'MacOS苹果电脑',
+    info: '不支持INFUSE点这里',
+    icon: 'logos--apple',
+    link: 'https://www.emby123.cn:5001/sharing/dz6pPCKYr'
+  },
+  {
+    title: 'Windows电脑',
+    info: '操作教程及软件下载',
+    icon: 'logos--microsoft-windows-icon',
+    link: 'https://www.emby123.cn:5001/sharing/TcPN0FQPx'
+  }
+]
 </script>
 
 <template>
@@ -168,6 +195,29 @@ async function newUser() {
       </div>
     </div>
     <main v-else class="mx-auto" style="max-width: 800px">
+      <div class="my-4 p-4 overflow-hidden rounded-xl" style="background-color: #282828">
+        <div class="flex items-center justify-between mb-4">
+          <img src="@/assets/images/emby.png" class="h-10" />
+          <h1 class="font-bold text-2xl">教程及软件下载</h1>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <a
+            v-for="item in downloadLink"
+            :key="item.title"
+            :href="item.link"
+            target="_blank"
+            class="cursor-pointer bg-white/10 hover:bg-white/20 rounded-xl flex-1 h-16 flex justify-between items-center p-3"
+          >
+            <span class="h-full aspect-square overflow-hidden">
+              <i :class="`pi icon-[${item.icon}] block h-full w-full`"></i>
+            </span>
+            <div class="iconify mdi-light--home text-blue-600 text-right">
+              <h1 class="text-primary-50">{{ item.title }}</h1>
+              <p class="text-white text-sm text-white/50">{{ item.info }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
       <form
         class="my-4 p-4 w-full overflow-hidden rounded-xl"
         style="background-color: #282828"

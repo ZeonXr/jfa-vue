@@ -57,6 +57,9 @@ importers:
       '@iconify-json/ion':
         specifier: ^1.1.19
         version: 1.1.19
+      '@iconify-json/logos':
+        specifier: ^1.1.44
+        version: 1.1.44
       '@iconify/tailwind':
         specifier: ^1.1.2
         version: 1.1.2
@@ -312,6 +315,9 @@ packages:
 
   '@iconify-json/ion@1.1.19':
     resolution: {integrity: sha512-ijYnInYvTsyw/H9WrVlyptiryogi95BhLSKLk/lX8lshctoK7Gaw21Rlatn7qk4RJPNLQNIy/vT1N9trA5Creg==}
+
+  '@iconify-json/logos@1.1.44':
+    resolution: {integrity: sha512-sIc355/sSq4GihU4eFTDVbXoeg2rZD3yH6tNOJTNouDu9Fx259BSWH+XEEQwm/YImDIllcGqmJuNBjAu4UVs2g==}
 
   '@iconify/tailwind@1.1.2':
     resolution: {integrity: sha512-ZgToKxxd7zF5T9NXPnY9APRF06ZjFF21H/bINzcbKTdeJzLrNLIoVaoePIUbWVQ2HAac5cAYEHPZO8ILSUe3bQ==}
@@ -2048,6 +2054,10 @@ snapshots:
   '@humanwhocodes/object-schema@2.0.3': {}
 
   '@iconify-json/ion@1.1.19':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/logos@1.1.44':
     dependencies:
       '@iconify/types': 2.0.0
 
