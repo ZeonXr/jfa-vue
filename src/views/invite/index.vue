@@ -200,7 +200,7 @@ const downloadLink = [
           <img src="@/assets/images/emby.png" class="h-10" />
           <h1 class="font-bold text-2xl">教程及软件下载</h1>
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid sm:grid-cols-2 gap-4 grid-cols-1">
           <a
             v-for="item in downloadLink"
             :key="item.title"
