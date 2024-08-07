@@ -38,6 +38,9 @@ importers:
       vue:
         specifier: ^3.4.35
         version: 3.4.35(typescript@5.4.5)
+      vue-router:
+        specifier: '4'
+        version: 4.4.3(vue@3.4.35(typescript@5.4.5))
     devDependencies:
       '@iconify-json/ion':
         specifier: ^1.1.19
@@ -1788,6 +1791,11 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
+  vue-router@4.4.3:
+    resolution: {integrity: sha512-sv6wmNKx2j3aqJQDMxLFzs/u/mjA9Z5LCgy6BE0f7yFWMjrPLnS/sPNn8ARY/FXw6byV18EFutn5lTO6+UsV5A==}
+    peerDependencies:
+      vue: ^3.2.0
+
   vue-tsc@2.0.29:
     resolution: {integrity: sha512-MHhsfyxO3mYShZCGYNziSbc63x7cQ5g9kvijV7dRe1TTXBRLxXyL0FnXWpUF1xII2mJ86mwYpYsUmMwkmerq7Q==}
     hasBin: true
@@ -3525,6 +3533,11 @@ snapshots:
       semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
+
+  vue-router@4.4.3(vue@3.4.35(typescript@5.4.5)):
+    dependencies:
+      '@vue/devtools-api': 6.6.3
+      vue: 3.4.35(typescript@5.4.5)
 
   vue-tsc@2.0.29(typescript@5.4.5):
     dependencies:

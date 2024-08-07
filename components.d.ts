@@ -13,6 +13,8 @@ declare module 'vue' {
     Dialog: typeof import('primevue/dialog')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Login: typeof import('./src/components/Login.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
     Select: typeof import('primevue/select')['default']
     ToggleSwitch: typeof import('primevue/toggleswitch')['default']
   }
