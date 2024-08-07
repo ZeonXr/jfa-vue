@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Home from '@/views/Home/index.vue'
+import home from '@/views/home/index.vue'
 
 // declare module 'vue-router' {
 //   interface RouteMeta {
@@ -13,7 +13,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: home
+    },
+    {
+      path: '/invite/:code',
+      name: 'invite',
+      component: () => import('@/views/invite/index.vue')
     },
     {
       path: '/:pathMatch(.*)*',

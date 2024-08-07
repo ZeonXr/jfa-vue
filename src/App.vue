@@ -4,6 +4,8 @@
   <RouterView v-slot="{ Component }">
     <component :is="Component" />
   </RouterView>
+  <ConfirmDialog :draggable="false" />
+  <Toast />
 </template>
 
 <style lang="scss">
@@ -15,7 +17,7 @@ body,
   background-color: #101010;
   overflow: hidden;
 }
-.RouterView {
+#app {
   overflow-y: auto;
 }
 </style>

@@ -87,7 +87,7 @@ async function createInvite() {
   createInviteIng.value = false
 }
 
-const { copy } = useClipboard()
+const { copy } = useClipboard({ legacy: true })
 
 function copyItem(code: string) {
   copy(host.value + '/invite/' + code)
@@ -138,6 +138,9 @@ async function deleteAll() {
       deleteAllIng.value = false
     },
     reject: () => {
+      deleteAllIng.value = false
+    },
+    onHide: () => {
       deleteAllIng.value = false
     }
   })
@@ -367,7 +370,7 @@ function copySelected() {
         <div class="flex justify-center items-center bg-white/20 rounded-l-md px-2.5">批量次数</div>
         <InputNumber
           v-model="countInvite"
-          class="flex-1 rounded-r-none text-center"
+          class="flex-1 rounded-r-none text-center batchTimes"
           fluid
           show-buttons
           :min="1"
@@ -376,7 +379,6 @@ function copySelected() {
           type="submit"
           class="flex-1 !rounded-l-none"
           label="创建"
-          :disabled="createInviteIng"
           :loading="createInviteIng"
         />
       </div>
@@ -421,7 +423,6 @@ function copySelected() {
             severity="danger"
             icon="pi pi-trash"
             class="!p-0 !px-2 mr-2"
-            :disabled="deleteSelectedIng"
             :loading="deleteSelectedIng"
             @click="deleteSelected"
           />
@@ -438,7 +439,6 @@ function copySelected() {
             severity="danger"
             icon="pi pi-trash"
             class="!p-0 !px-2"
-            :disabled="deleteAllIng"
             :loading="deleteAllIng"
             @click="deleteAll"
           />
@@ -460,13 +460,21 @@ function copySelected() {
             class="ml-2"
           />
           <div class="flex-1 flex px-2 overflow-hidden">
-            <a
+            <!-- <a
               class="flex-1 cursor-pointer hover:underline text-ellipsis overflow-hidden"
               :href="host + '/invite/' + item.code"
               target="_blank"
             >
               {{ item.code }}
-            </a>
+            </a> -->
+            <RouterLink
+              class="flex-1 cursor-pointer hover:underline text-ellipsis overflow-hidden"
+              :to="`/invite/${item.code}`"
+              target="_blank"
+            >
+              {{ item.code }}
+            </RouterLink>
+
             <span class="flex-shrink-0">
               {{
                 (item.months ? item.months + '月' : '') +
@@ -497,20 +505,15 @@ function copySelected() {
       </ul>
     </div>
   </main>
-  <ConfirmDialog :draggable="false" />
   <Login v-model="loging" />
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .jfa-vue {
-  .remaining-uses {
-    .p-inputnumber {
-      @apply rounded-r-none;
-    }
-
+  ::v-deep(.remaining-uses),
+  ::v-deep(.batchTimes) {
     .p-inputnumber-input {
-      @apply bg-white/10 px-4 py-2 text-primary-50 text-center rounded-r-none;
-
+      @apply bg-white/10 px-4 py-2 text-primary-50 text-center;
       &[disabled] {
         @apply bg-black/10 cursor-not-allowed text-white/50;
 
@@ -520,16 +523,22 @@ function copySelected() {
       }
     }
   }
-
-  .btn-box {
-    .p-inputnumber {
-      @apply rounded-none;
-    }
-
+  ::v-deep(.remaining-uses) {
     .p-inputnumber-input {
-      @apply bg-white/10 px-4 py-2 text-primary-50 w-full text-center rounded-none;
+      @apply rounded-r-none;
     }
   }
+
+  ::v-deep(.batchTimes) {
+    .p-inputnumber-input {
+      @apply rounded-none;
+    }
+  }
+
+  //   .p-inputnumber-input {
+  //     @apply bg-white/10 px-4 py-2 text-primary-50 w-full text-center rounded-none;
+  //   }
+  // }
 
   .user-expiry.disabled {
     position: relative;

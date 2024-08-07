@@ -6,6 +6,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import ConfirmationService from 'primevue/confirmationservice'
+import ToastService from 'primevue/toastservice'
 
 import router from './router'
 
@@ -21,6 +22,7 @@ app.use(PrimeVue, {
   }
 })
 app.use(ConfirmationService)
+app.use(ToastService)
 app.use(router)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
