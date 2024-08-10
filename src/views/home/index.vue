@@ -4,14 +4,17 @@ import { storeToRefs } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { fetchInstance } from '@/utils/api'
 import { computed, ref, watch } from 'vue'
-import InputNumber from 'primevue/inputnumber'
 import { useClipboard } from '@vueuse/core'
 import { useConfirm } from 'primevue/useconfirm'
+import type { ValuesType } from 'utility-types'
+import { FilterMatchMode } from '@primevue/core/api'
 
 const configStore = useConfigStore()
 const { host } = storeToRefs(configStore)
 
 const arropt = Array.from({ length: 31 }, (_, k) => ({ label: k + '', value: k }))
+const optHours = Array.from({ length: 24 }, (_, k) => ({ label: k + '', value: k }))
+const optMinutes = Array.from({ length: 60 }, (_, k) => ({ label: k + '', value: k }))
 
 const formData = ref({
   months: 0,
@@ -32,13 +35,56 @@ const formData = ref({
   user_label: ''
 })
 
-const { data, execute: refresh } = fetchInstance('/invites', {
+const { data: fetchData, execute: refresh } = fetchInstance('/invites', {
   refetch: true,
   immediate: false
 })
   .get()
-  .json()
-const invites = computed(() => data.value?.invites || [])
+  .json<{
+    profiles: string[]
+    invites?: (typeof formData.value & { code: string })[]
+  }>()
+
+const invites = computed(() => {
+  return (
+    fetchData.value?.invites?.map((item) => {
+      let expiryTime = ''
+      if (item['user-expiry']) {
+        expiryTime = ['user-months', 'user-days', 'user-hours', 'user-minutes']
+          .map((key) => (((item as any)[key] ?? 0) + '').padStart(2, '0'))
+          .join('-')
+      } else {
+        expiryTime = '99-99-99-99'
+      }
+      const inviteTime = ['months', 'days', 'hours', 'minutes']
+        .map((key) => (((item as any)[key] ?? 0) + '').padStart(2, '0'))
+        .join('-')
+
+      return {
+        ...item,
+        expiryTime: expiryTime,
+        inviteTime: inviteTime
+      }
+    }) || []
+  )
+})
+
+function formatExpiryTime(str: string): string {
+  if (str === '99-99-99-99') {
+    return '永久有效'
+  }
+  const timeArr = str.split('-')
+  const suffixArr = ['月', '天', '时', '分']
+  const resArr = []
+  for (let i = 0; i < timeArr.length; i++) {
+    if (timeArr[i] !== '00') {
+      resArr.push(parseInt(timeArr[i]) + suffixArr[i])
+    }
+  }
+
+  return resArr.join('-')
+}
+
 const profiles = computed(() => {
   const defaultProfiles = [
     {
@@ -46,7 +92,7 @@ const profiles = computed(() => {
       value: ''
     }
   ]
-  const arrProfiles = (data.value?.profiles || []).map((item: string) => ({
+  const arrProfiles = (fetchData.value?.profiles || []).map((item: string) => ({
     label: item,
     value: item
   }))
@@ -94,7 +140,7 @@ function copyItem(code: string) {
 }
 
 function copyAll() {
-  copy(invites.value.map((item: any) => host.value + '/invite/' + item.code).join('\n'))
+  copy(invites.value.map((item) => host.value + '/invite/' + item.code).join('\n'))
 }
 
 function deleteItem(code: string) {
@@ -146,23 +192,23 @@ async function deleteAll() {
   })
 }
 
-const selectedInvites = ref([])
+const selectedInvites = ref<typeof invites.value>([])
 
-function selectAll() {
-  if (selectedInvites.value.length > 0) {
-    selectedInvites.value = []
-  } else {
-    selectedInvites.value = invites.value.map((_: any, index: any) => index)
-  }
-}
+// function selectAll() {
+//   if (selectedInvites.value.length > 0) {
+//     selectedInvites.value = []
+//   } else {
+//     selectedInvites.value = invites.value
+//   }
+// }
 
 const deleteSelectedIng = ref(false)
 
 async function deleteSelected() {
   deleteSelectedIng.value = true
-  const delArr = selectedInvites.value.map((index: any) =>
+  const delArr = selectedInvites.value.map((item) =>
     fetchInstance('/invites').delete({
-      code: invites.value[index].code
+      code: item.code
     })
   )
   await Promise.all(delArr)
@@ -172,11 +218,17 @@ async function deleteSelected() {
 }
 
 function copySelected() {
-  copy(
-    selectedInvites.value
-      .map((index: any) => host.value + '/invite/' + invites.value[index].code)
-      .join('\n')
-  )
+  copy(selectedInvites.value.map((item) => host.value + '/invite/' + item.code).join('\n'))
+}
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+})
+
+const dt = ref()
+
+function exportCSV() {
+  dt.value.exportCSV()
 }
 </script>
 
@@ -223,7 +275,7 @@ function copySelected() {
               <Select
                 id="小时"
                 v-model="formData.hours"
-                :options="arropt"
+                :options="optHours"
                 option-label="label"
                 option-value="value"
                 class="!bg-white/10 border-0 !px-1.5 !py-0.5 text-primary-50 w-full"
@@ -234,7 +286,7 @@ function copySelected() {
               <Select
                 id="分钟"
                 v-model="formData.minutes"
-                :options="arropt"
+                :options="optMinutes"
                 option-label="label"
                 option-value="value"
                 class="!bg-white/10 border-0 !px-1.5 !py-0.5 text-primary-50 w-full"
@@ -384,27 +436,28 @@ function copySelected() {
       </div>
     </form>
     <div
-      class="flex flex-col mt-4 p-2 w-full overflow-hidden rounded-xl max-h-screen box-border"
+      v-if="invites.length !== 0"
+      class="flex flex-col mt-4 p-4 gap-2 w-full overflow-hidden rounded-xl h-screen max-h-screen box-border"
       style="background-color: #282828"
     >
-      <div class="m-2 text-2xl font-bold flex justify-between">
+      <div class="text-2xl font-bold flex justify-between items-center">
         <h1>
           <span>邀请</span>
           <span class="text-xl mr-2">({{ invites.length }})</span>
           <Button
             type="button"
-            label="刷新"
+            rounded
             icon="pi pi-refresh"
             class="!p-0 !px-2 mr-2"
             @click="refresh"
           />
-          <Button
+          <!-- <Button
             type="button"
             label="全选"
             icon="pi pi-check"
             class="!p-0 !px-2"
             @click="selectAll"
-          />
+          /> -->
         </h1>
         <div>
           <Button
@@ -444,7 +497,20 @@ function copySelected() {
           />
         </div>
       </div>
-      <ul
+      <div class="text-2xl font-bold flex justify-between items-center">
+        <h1>
+          <span class="mr-4">搜索</span>
+          <InputText
+            v-model.lazy="filters['global'].value"
+            class="!bg-white/10 !px-4 !h-full !text-primary-50"
+            placeholder="搜索 如：‘1月’"
+          />
+        </h1>
+        <div>
+          <Button icon="pi pi-external-link" label="导出" class="!p-0 !px-2" @click="exportCSV" />
+        </div>
+      </div>
+      <!-- <ul
         class="flex-1 flex flex-col m-4 p-3 gap-2 border border-white/10 overflow-y-auto rounded-md"
       >
         <li
@@ -495,7 +561,54 @@ function copySelected() {
             @click="deleteItem(item.code)"
           />
         </li>
-      </ul>
+      </ul> -->
+      <DataTable
+        ref="dt"
+        v-model:selection="selectedInvites"
+        v-model:filters="filters"
+        :value="invites"
+        scrollable
+        scroll-height="flex"
+        removable-sort
+        data-key="code"
+        class="flex-1 border border-white/10 rounded-md h-full overflow-y-auto"
+        style="background: var(--p-datatable-header-cell-background)"
+      >
+        <Column selection-mode="multiple" header-style="width: 3rem" />
+        <Column field="code" class="min-w-24 overflow-hidden" header="邀请码">
+          <template #body="{ data }: { data: ValuesType<typeof invites.value> }">
+            <RouterLink
+              :to="`/invite/${data.code}`"
+              target="_blank"
+              class="cursor-pointer hover:underline"
+            >
+              {{ data.code }}
+            </RouterLink>
+          </template>
+        </Column>
+        <Column field="expiryTime" class="min-w-24" header="账号有效期" sortable>
+          <template #body="{ data }: { data: ValuesType<typeof invites.value> }">
+            {{ formatExpiryTime(data.expiryTime) }}
+          </template>
+        </Column>
+        <Column field="inviteTime" class="min-w-24" header="邀请有效期" sortable>
+          <template #body="{ data }: { data: ValuesType<typeof invites.value> }">
+            {{ formatExpiryTime(data.inviteTime) }}
+          </template>
+        </Column>
+        <Column :exportable="false" frozen align-frozen="right" class="min-w-32 !text-right">
+          <template #body="{ data }: { data: ValuesType<typeof invites.value> }">
+            <Button icon="pi pi-copy" outlined rounded class="mr-2" @click="copyItem(data.code)" />
+            <Button
+              icon="pi pi-trash"
+              outlined
+              rounded
+              severity="danger"
+              @click="deleteItem(data.code)"
+            />
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </main>
   <Login v-model="loging" />

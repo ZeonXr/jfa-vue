@@ -14,6 +14,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@primevue/core": "^4.0.4",
     "@primevue/themes": "^4.0.4",
     "@vueuse/core": "^10.11.0",
     "@vueuse/integrations": "^10.11.0",
@@ -27,6 +28,7 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.0.4",
     "tailwindcss-primeui": "^0.3.4",
+    "utility-types": "^3.11.0",
     "vue": "^3.4.35",
     "vue-router": "4"
   },
