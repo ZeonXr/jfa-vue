@@ -8,11 +8,10 @@ const staticPath = path.resolve(import.meta.dirname, '../dist')
 app.use(express.static(staticPath))
 
 app.use(
-  '/_proxy_',
+  process.env.VITE_PROXY_PREFIX,
   createProxyMiddleware({
     router: (req) => {
-      const target = req.originalUrl.replace('/_proxy_/', '')
-      const origin = new URL(target).origin
+      const origin = new URL(req.url?.slice(1) ?? '').origin
       return origin
     },
     pathRewrite: (path) => {
@@ -22,8 +21,7 @@ app.use(
   })
 )
 
-// eslint-disable-next-line no-undef
-const port = process.env.SERVER_PORT || 8080
+const port = process.env.SERVER_PORT
 app.listen(port, () => {
-  console.log('jfa-vue启动成功')
+  console.log(`jfa-vue启动成功---端口: ${process.env.SERVER_PORT}`)
 })
