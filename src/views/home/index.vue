@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import Login from './Login.vue'
-import { storeToRefs } from 'pinia'
-import { useConfigStore } from '@/stores/config'
+// import { storeToRefs } from 'pinia'
+// import { useConfigStore } from '@/stores/config'
 import { fetchInstance } from '@/utils/api'
 import { computed, ref, watch } from 'vue'
-import { useClipboard } from '@vueuse/core'
+import { useClipboard, useBrowserLocation, useDateFormat } from '@vueuse/core'
 import { useConfirm } from 'primevue/useconfirm'
 import type { ValuesType } from 'utility-types'
 import { FilterMatchMode } from '@primevue/core/api'
+import { mkConfig, generateCsv, download } from 'export-to-csv'
 
-const configStore = useConfigStore()
-const { host } = storeToRefs(configStore)
+// const configStore = useConfigStore()
+// const { host } = storeToRefs(configStore)
+const location = useBrowserLocation()
 
 const arropt = Array.from({ length: 31 }, (_, k) => ({ label: k + '', value: k }))
 const optHours = Array.from({ length: 24 }, (_, k) => ({ label: k + '', value: k }))
@@ -42,7 +44,7 @@ const { data: fetchData, execute: refresh } = fetchInstance('/invites', {
   .get()
   .json<{
     profiles: string[]
-    invites?: (typeof formData.value & { code: string })[]
+    invites?: (typeof formData.value & { code: string; created: number })[]
   }>()
 
 const invites = computed(() => {
@@ -60,10 +62,14 @@ const invites = computed(() => {
         .map((key) => (((item as any)[key] ?? 0) + '').padStart(2, '0'))
         .join('-')
 
+      const createdDate = useDateFormat(new Date(item.created * 1000), 'YYYY-MM-DD HH:mm:ss').value
+
       return {
         ...item,
-        expiryTime: expiryTime,
-        inviteTime: inviteTime
+        inviteUrl: location.value.origin + '/#/invite/' + item.code,
+        expiryTime,
+        inviteTime,
+        createdDate
       }
     }) || []
   )
@@ -135,12 +141,12 @@ async function createInvite() {
 
 const { copy } = useClipboard({ legacy: true })
 
-function copyItem(code: string) {
-  copy(host.value + '/invite/' + code)
+function copyItem(item: ValuesType<typeof invites.value>) {
+  copy(item.inviteUrl)
 }
 
 function copyAll() {
-  copy(invites.value.map((item) => host.value + '/invite/' + item.code).join('\n'))
+  copy(invites.value.map((item) => item.inviteUrl).join('\n'))
 }
 
 function deleteItem(code: string) {
@@ -218,22 +224,30 @@ async function deleteSelected() {
 }
 
 function copySelected() {
-  copy(selectedInvites.value.map((item) => host.value + '/invite/' + item.code).join('\n'))
+  copy(selectedInvites.value.map((item) => item.inviteUrl).join('\n'))
 }
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
-const dt = ref()
-
-function exportCSV() {
-  dt.value.exportCSV()
+function exportCSV({ selectionOnly }: { selectionOnly?: boolean }) {
+  const csvConfig = mkConfig({
+    useKeysAsHeaders: true,
+    filename: useDateFormat(new Date(), 'YYYY-MM-DD_HH-mm-ss').value
+  })
+  let csv
+  if (selectionOnly) {
+    csv = generateCsv(csvConfig)(selectedInvites.value)
+  } else {
+    csv = generateCsv(csvConfig)(invites.value)
+  }
+  download(csvConfig)(csv)
 }
 </script>
 
 <template>
-  <main class="jfa-vue mx-auto" style="max-width: 1080px">
+  <main class="jfa-vue mx-auto" style="max-width: 1200px">
     <form
       class="my-4 p-2 w-full overflow-hidden rounded-xl"
       style="background-color: #282828"
@@ -441,15 +455,22 @@ function exportCSV() {
       style="background-color: #282828"
     >
       <div class="text-2xl font-bold flex justify-between items-center">
-        <h1>
+        <h1 class="flex flex-wrap gap-2">
           <span>邀请</span>
-          <span class="text-xl mr-2">({{ invites.length }})</span>
+          <span class="text-xl">({{ invites.length }})</span>
+          <Button type="button" icon="pi pi-refresh" class="!p-0 !px-2 mr-2" @click="refresh" />
           <Button
-            type="button"
-            rounded
-            icon="pi pi-refresh"
-            class="!p-0 !px-2 mr-2"
-            @click="refresh"
+            icon="pi pi-external-link"
+            label="导出全部"
+            class="!p-0 !px-2"
+            @click="exportCSV"
+          />
+          <Button
+            v-show="selectedInvites.length"
+            icon="pi pi-external-link"
+            :label="`导出(${selectedInvites.length})`"
+            class="!p-0 !px-2"
+            @click="exportCSV({ selectionOnly: true })"
           />
           <!-- <Button
             type="button"
@@ -459,13 +480,13 @@ function exportCSV() {
             @click="selectAll"
           /> -->
         </h1>
-        <div>
+        <div class="flex flex-wrap gap-2 justify-end">
           <Button
             v-show="selectedInvites.length"
             type="button"
             :label="`复制(${selectedInvites.length})`"
             icon="pi pi-copy"
-            class="!p-0 !px-2 mr-2"
+            class="!p-0 !px-2"
             :disabled="!selectedInvites.length"
             @click="copySelected"
           />
@@ -475,7 +496,7 @@ function exportCSV() {
             :label="`删除(${selectedInvites.length})`"
             severity="danger"
             icon="pi pi-trash"
-            class="!p-0 !px-2 mr-2"
+            class="!p-0 !px-2"
             :loading="deleteSelectedIng"
             @click="deleteSelected"
           />
@@ -483,7 +504,7 @@ function exportCSV() {
             type="button"
             label="复制全部"
             icon="pi pi-copy"
-            class="!p-0 !px-2 mr-2"
+            class="!p-0 !px-2"
             @click="copyAll"
           />
           <Button
@@ -497,7 +518,7 @@ function exportCSV() {
           />
         </div>
       </div>
-      <div class="text-2xl font-bold flex justify-between items-center">
+      <!-- <div class="text-2xl font-bold flex justify-between items-center">
         <h1>
           <span class="mr-4">搜索</span>
           <InputText
@@ -509,7 +530,7 @@ function exportCSV() {
         <div>
           <Button icon="pi pi-external-link" label="导出" class="!p-0 !px-2" @click="exportCSV" />
         </div>
-      </div>
+      </div> -->
       <!-- <ul
         class="flex-1 flex flex-col m-4 p-3 gap-2 border border-white/10 overflow-y-auto rounded-md"
       >
@@ -563,7 +584,6 @@ function exportCSV() {
         </li>
       </ul> -->
       <DataTable
-        ref="dt"
         v-model:selection="selectedInvites"
         v-model:filters="filters"
         :value="invites"
@@ -596,9 +616,10 @@ function exportCSV() {
             {{ formatExpiryTime(data.inviteTime) }}
           </template>
         </Column>
+        <Column field="createdDate" class="min-w-24" header="创建时间" sortable />
         <Column :exportable="false" frozen align-frozen="right" class="min-w-32 !text-right">
           <template #body="{ data }: { data: ValuesType<typeof invites.value> }">
-            <Button icon="pi pi-copy" outlined rounded class="mr-2" @click="copyItem(data.code)" />
+            <Button icon="pi pi-copy" outlined rounded class="mr-2" @click="copyItem(data)" />
             <Button
               icon="pi pi-trash"
               outlined
