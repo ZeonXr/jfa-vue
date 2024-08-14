@@ -21,10 +21,10 @@ const htmlDoc = computed(() => jq(inviteDom.value!))
 
 const htmlval = computed(() => {
   const embyHost = htmlDoc.value.find('#create-success-button').attr('href')
-  const email = htmlDoc.value
-    .find('div.flex-initial .col.aside')
-    .text()
-    .replace('需要帮助，请发邮件到', '')
+  // const email = htmlDoc.value
+  //   .find('div.flex-initial .col.aside')
+  //   .text()
+  //   .replace('需要帮助，请发邮件到', '')
   const userExpiry = htmlDoc.value.text()
   const userExpiryObj = {
     userExpiryMonths: 0,
@@ -51,7 +51,8 @@ const htmlval = computed(() => {
 
   return {
     embyHost,
-    email,
+    // email,
+    wx_account: import.meta.env.VITE_WX,
     ...userExpiryObj,
     userExpiryDate
   }
@@ -156,28 +157,22 @@ async function newUser() {
 
 const downloadLink = [
   {
-    title: '苹果TV/手机/平板',
-    info: '操作视频教程',
-    icon: 'icon-[logos--apple]',
-    link: 'https://www.emby123.cn:5001/sharing/ufj2abtDo'
-  },
-  {
     title: '安卓电视/手机/投影',
     info: '操作教程及软件下载',
     icon: 'icon-[logos--android-icon]',
-    link: 'https://www.emby123.cn:5001/sharing/kWC9KW4WQ'
+    link: 'https://www.emby123.cn:5001/sharing/gfj5CRl7A'
   },
   {
-    title: 'MacOS苹果电脑',
-    info: '不支持INFUSE点这里',
+    title: '苹果TV/手机/平板',
+    info: '操作视频教程',
     icon: 'icon-[logos--apple]',
-    link: 'https://www.emby123.cn:5001/sharing/dz6pPCKYr'
+    link: 'https://www.emby123.cn:5001/sharing/gfj5CRl7A'
   },
   {
     title: 'Windows电脑',
     info: '操作教程及软件下载',
     icon: 'icon-[logos--microsoft-windows-icon]',
-    link: 'https://www.emby123.cn:5001/sharing/TcPN0FQPx'
+    link: 'https://www.emby123.cn:5001/sharing/cLhlBrPZD'
   }
 ]
 </script>
@@ -191,16 +186,19 @@ const downloadLink = [
       <div class="max-w-96 h-fit rounded-xl p-3" style="background-color: #282828">
         <h1 class="font-bold text-3xl">邀请码无效</h1>
         <h1 class="mb-2">邀请码可能不正确，或者已过期。</h1>
-        <p>如需要帮助，请发邮件到 ashan0927@outlook.com</p>
+        <p>如需要帮助，请联系微信：{{ htmlval.wx_account }}</p>
       </div>
     </div>
     <main v-else class="mx-auto" style="max-width: 800px">
       <div class="my-4 p-4 overflow-hidden rounded-xl" style="background-color: #282828">
         <div class="flex items-center justify-between mb-4">
           <img src="@/assets/images/emby.png" class="h-10" />
-          <h1 class="font-bold text-2xl">教程及软件下载</h1>
+          <h1 class="font-bold text-xl text-right flex flex-wrap justify-end">
+            <div>教程及软件下载</div>
+            <span>(客服微信: {{ htmlval.wx_account }})</span>
+          </h1>
         </div>
-        <div class="grid sm:grid-cols-2 gap-4 grid-cols-1">
+        <div class="grid sm:grid-cols-3 gap-4 grid-cols-1">
           <a
             v-for="item in downloadLink"
             :key="item.title"
@@ -212,8 +210,8 @@ const downloadLink = [
               <i class="block h-full w-full iconify" :class="item.icon"></i>
             </span>
             <div class="iconify mdi-light--home text-blue-600 text-right">
-              <h1 class="text-primary-50">{{ item.title }}</h1>
-              <p class="text-white text-sm text-white/50">{{ item.info }}</p>
+              <h1 class="text-primary-50 font-bold">{{ item.title }}</h1>
+              <!-- <p class="text-white text-sm text-white/50">{{ item.info }}</p> -->
             </div>
           </a>
         </div>

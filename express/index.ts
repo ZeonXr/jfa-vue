@@ -21,7 +21,7 @@ app.use(
   })
 )
 
-const port = process.env.SERVER_PORT
+const port = process.env.VITE_SERVER_PORT
 app.listen(port, () => {
-  console.log(`jfa-vue启动成功---端口: ${process.env.SERVER_PORT}`)
+  console.log(`jfa-vue启动成功---端口: ${process.env.VITE_SERVER_PORT}`)
 })

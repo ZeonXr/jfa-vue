@@ -8,14 +8,14 @@ const visible = defineModel({ type: Boolean, default: true })
 
 const configStore = useConfigStore()
 
-const { host, username, password, token } = storeToRefs(configStore)
+const { username, password, token } = storeToRefs(configStore)
 
 const BasicToken = computed(() => btoa(`${username.value}:${password.value}`))
 
 const isFetching = ref(false)
 
 async function login() {
-  if (!host.value || !username.value || !password.value) return
+  if (!username.value || !password.value) return
   isFetching.value = true
   try {
     const { data } = await fetchInstance('/token/login', {
@@ -53,14 +53,14 @@ async function login() {
         @submit.prevent="login"
       >
         <h1 class="text-white text-center text-3xl">登录</h1>
-        <div class="inline-flex flex-col gap-2">
+        <!-- <div class="inline-flex flex-col gap-2">
           <label for="host" class="text-primary-50 font-semibold">主机地址</label>
           <InputText
             id="host"
             v-model.trim="host"
             class="!bg-white/20 !border-0 !px-4 !py-2 !text-primary-50 w-full"
           />
-        </div>
+        </div> -->
         <div class="inline-flex flex-col gap-2">
           <label for="username" class="text-primary-50 font-semibold">用户名</label>
           <InputText

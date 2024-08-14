@@ -5,6 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - SERVER_PORT=${SERVER_PORT}
+      - VITE_SERVER_PORT=${VITE_SERVER_PORT}
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+      - ${VITE_SERVER_PORT}:${VITE_SERVER_PORT}

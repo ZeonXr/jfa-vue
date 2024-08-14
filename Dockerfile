@@ -12,4 +12,4 @@ RUN pnpm install
 
 CMD [ "pnpm", "run" , "server"]
 
-EXPOSE ${SERVER_PORT:-8080}
+EXPOSE ${VITE_SERVER_PORT:-8080}

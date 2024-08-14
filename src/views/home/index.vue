@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import Login from './Login.vue'
-// import { storeToRefs } from 'pinia'
-// import { useConfigStore } from '@/stores/config'
 import { fetchInstance } from '@/utils/api'
 import { computed, ref, watch } from 'vue'
 import { useClipboard, useBrowserLocation, useDateFormat } from '@vueuse/core'
@@ -10,8 +8,6 @@ import type { ValuesType } from 'utility-types'
 import { FilterMatchMode } from '@primevue/core/api'
 import { mkConfig, generateCsv, download } from 'export-to-csv'
 
-// const configStore = useConfigStore()
-// const { host } = storeToRefs(configStore)
 const location = useBrowserLocation()
 
 const arropt = Array.from({ length: 31 }, (_, k) => ({ label: k + '', value: k }))
