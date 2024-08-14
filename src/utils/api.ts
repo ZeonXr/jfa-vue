@@ -6,7 +6,7 @@ export const fetchInstance = createFetch({
     beforeFetch({ url, options }) {
       const configStore = useConfigStore()
       // url = `/api?url=${configStore.host}${url}`
-      url = `${import.meta.env.VITE_PROXY_PREFIX}${configStore.host}${url}`
+      url = `${import.meta.env.VITE_PROXY_PREFIX}${import.meta.env.VITE_JFA_API_URL}${url}`
 
       if (configStore.token !== '') {
         options.headers = {

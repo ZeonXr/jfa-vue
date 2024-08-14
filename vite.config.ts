@@ -17,7 +17,7 @@ export default ({ mode }: { mode: 'development' | 'production' }) => {
     ],
     server: {
       host: '0.0.0.0',
-      port: Number(process.env.SERVER_PORT),
+      port: Number(process.env.VITE_SERVER_PORT),
       proxy: {
         [process.env.VITE_PROXY_PREFIX]: {
           changeOrigin: true,

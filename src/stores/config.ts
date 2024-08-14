@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 export const useConfigStore = defineStore(
   'config',
   () => {
-    const host = ref('')
+    // const host = ref('')
 
     const username = ref('')
 
@@ -18,7 +18,7 @@ export const useConfigStore = defineStore(
     // const isLogin = computed(() => account.value !== '' && password.value !== '')
 
     return {
-      host,
+      // host,
       username,
       password,
       token
