@@ -454,12 +454,12 @@ function exportCSV({ selectionOnly }: { selectionOnly?: boolean }) {
         <h1 class="flex flex-wrap gap-2">
           <span>邀请</span>
           <span class="text-xl">({{ invites.length }})</span>
-          <Button type="button" icon="pi pi-refresh" class="!p-0 !px-2 mr-2" @click="refresh" />
+          <Button type="button" icon="pi pi-refresh" class="!p-0 !px-2 mr-2" @click="refresh()" />
           <Button
             icon="pi pi-external-link"
             label="导出全部"
             class="!p-0 !px-2"
-            @click="exportCSV"
+            @click="exportCSV({ selectionOnly: false })"
           />
           <Button
             v-show="selectedInvites.length"
